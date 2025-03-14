@@ -1,5 +1,5 @@
 """script to demonstrate ollama simple chatbox"""
-import ollama
+from libs.assistant_helper import Assistant
 
 # Initialize the Ollama client
 
@@ -8,34 +8,24 @@ import ollama
 class MyChatbot():
     """Custom chatbot class"""
     def __init__(self):
-        self.client = ollama.Client()
+        self.assistant = Assistant('mistral', None)
 
     def ask_question(self, question):
         """Custom chatbot custom initiator"""
-        conversation = [
-            {
-                'role': 'user',
-                'content': question
-            }
-        ]
-
         # Get the assistant's response
-        response = self.client.chat(
-            # Ollama model
-            model='llama3.2',
-            # Conversation message
-            messages=conversation,
-            # Limit the context window size
-            options={'num_ctx': 1024}
+        assistant_response = self.assistant.generate(
+            prompt=question
         )
 
         # Extract the assistant's message
-        assistant_message = response.message.content
-        print(f"Assistant: {assistant_message}")
+        print(f" assistant: {assistant_response}")
 
 def main():
     """Custom chatbot init function"""
+    # Initiate chatbot class
     bot = MyChatbot()
+    print("Hi! This is AI assistant. Type your question or exit to close.")
+    # loop until user enters 'exit'
     while True:
         content = input("user: ")
         if content == 'exit':
