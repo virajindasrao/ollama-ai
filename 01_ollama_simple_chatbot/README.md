@@ -1,5 +1,3 @@
-Here’s the README syntax based on the `01_ollama_simple_chatbot.py` script:
-
 ```markdown
 # Ollama Simple Chatbot
 

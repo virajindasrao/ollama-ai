@@ -1,5 +1,3 @@
-Here’s the README syntax based on the `02_ollama_chatbot_with_custom_system_prompt.py` script:
-
 ```markdown
 # Ollama Chatbot with Custom System Prompt
 
