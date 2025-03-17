@@ -39,7 +39,7 @@ This script demonstrates how to create a simple chatbot using the Ollama framewo
 
 1. Run the chatbot script:
    ```bash
-   python 01_ollama_simple_chatbot/01_ollama_simple_chatbot.py
+   python 01_ollama_simple_chatbot/ollama_simple_chatbot.py
    ```
 
 2. The chatbot will prompt you to enter a question. Type your question, and the assistant will respond. Type `exit` to end the session.

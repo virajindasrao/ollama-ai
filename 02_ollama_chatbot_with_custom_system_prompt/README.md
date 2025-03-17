@@ -39,7 +39,7 @@ This script demonstrates how to create a customized chatbot using the Ollama fra
 
 1. Run the chatbot script:
    ```bash
-   python 02_ollama_chatbot_with_custom_system_prompt/02_ollama_chatbot_with_custom_system_prompt.py
+   python 02_ollama_chatbot_with_custom_system_prompt/ollama_chatbot_with_custom_system_prompt.py
    ```
 
 2. The chatbot will prompt you to enter a question. Type your question, and the assistant will respond. Type `exit` to end the session.

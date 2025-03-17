@@ -39,7 +39,7 @@ This script demonstrates how to build a chatbot using the Ollama framework with 
 
 1. Run the chatbot script:
    ```bash
-   python 03_ollama_chatbot_with_context/03_ollama_chatbot_with_context.py
+   python 03_ollama_chatbot_with_context/ollama_chatbot_with_context.py
    ```
 
 2. The chatbot will prompt you to enter a question. Type your question, and the assistant will respond. Type `exit` to end the session.
