@@ -103,9 +103,15 @@ def fine_tune_model(
 ):
     print("Starting fine-tuning process...")
     device = torch.device("cpu")  # Force CPU-only execution
+    print(f"Using device: {device}")
 
+    print("Initializing DataLoader...")
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    print(f"DataLoader initialized with batch size: {batch_size}")
+
+    print("Initializing optimizer...")
     optimizer = torch.optim.AdamW(model_obj.parameters(), lr=learning_rate)
+    print(f"Optimizer initialized with learning rate: {learning_rate}")
 
     # Load checkpoint if available
     start_epoch = 0
@@ -118,11 +124,18 @@ def fine_tune_model(
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
         print(f"Resuming training from epoch {start_epoch}.")
+    else:
+        print("No checkpoint found. Starting training from scratch.")
 
+    print("Setting model to training mode...")
     model_obj.train()
+
     for epoch in range(start_epoch, epochs):
+        print(f"Starting epoch {epoch + 1}/{epochs}...")
         total_loss = 0
-        for batch in train_loader:
+
+        for batch_idx, batch in enumerate(train_loader):
+            print(f"Processing batch {batch_idx + 1}/{len(train_loader)}...")
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
@@ -130,12 +143,18 @@ def fine_tune_model(
             optimizer.zero_grad()
             outputs = model_obj(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
             loss = outputs.loss
+            print(f"Batch {batch_idx + 1} loss: {loss.item():.4f}")
             loss.backward()
             optimizer.step()
 
             total_loss += loss.item()
 
-        print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss / len(train_loader):.4f}")
+            # Log progress for every 10 batches
+            if (batch_idx + 1) % 10 == 0:
+                print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_loader)}, Loss: {loss.item():.4f}")
+
+        avg_loss = total_loss / len(train_loader)
+        print(f"Epoch {epoch + 1}/{epochs} completed. Average Loss: {avg_loss:.4f}")
 
         # Save checkpoint
         print(f"Saving checkpoint for epoch {epoch + 1}...")
@@ -145,6 +164,7 @@ def fine_tune_model(
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss
         }, checkpoint_path)
+        print(f"Checkpoint for epoch {epoch + 1} saved successfully.")
 
     print("Fine-tuning process completed.")
 
