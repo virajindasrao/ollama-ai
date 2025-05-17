@@ -22,7 +22,7 @@ else:
     print("CUDA is not available. The script will run on CPU.")
 
 # Set Hugging Face API token from environment variable
-HfFolder.save_token('<your token goes here>')
+HfFolder.save_token(os.environ.get("HUGGINGFACE_TOKEN", ""))
 
 class CustomDataset(Dataset):
     def __init__(self, dataset_file_path: str, tokenizer_obj, max_seq_length: int = 512):
