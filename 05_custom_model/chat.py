@@ -23,14 +23,17 @@ def chat_with_model(model_dir: str):
             max_length=512  # Explicitly set max_length
         )
 
-        # Generate response with attention_mask
+        # Generate response with attention_mask and adjusted decoding parameters
         outputs = model.generate(
             inputs["input_ids"],
             attention_mask=inputs["attention_mask"],  # Explicitly pass attention_mask
             max_new_tokens=50,  # Limit the number of new tokens generated
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
-            eos_token_id=tokenizer.eos_token_id
+            eos_token_id=tokenizer.eos_token_id,
+            temperature=0.7,  # Add randomness to the output
+            top_p=0.9,       # Use nucleus sampling
+            top_k=50         # Limit to top-k tokens
         )
 
         # Decode and print the response
