@@ -98,10 +98,9 @@ def fine_tune_model(
     train_data: Dataset,
     output_folder: str,
     epochs: int = 3,
-    batch_size: int = 4,  # Reduce batch size to save memory
+    batch_size: int = 8,
     learning_rate: float = 5e-5,
-    checkpoint_dir: str = "checkpoints",
-    accumulation_steps: int = 2  # Enable gradient accumulation
+    checkpoint_dir: str = "checkpoints"
 ):
     print("Starting fine-tuning process...")
     device = torch.device("cpu")  # Force CPU-only execution
@@ -147,10 +146,16 @@ def fine_tune_model(
             print(f"Batch {batch_idx + 1}: Input data moved to device successfully.")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
+            # Zero gradients
+            print(f"Batch {batch_idx + 1}: Zeroing gradients...")
+            optimizer.zero_grad()
+            print(f"Batch {batch_idx + 1}: Gradients zeroed.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+
             # Forward pass
             print(f"Batch {batch_idx + 1}: Performing forward pass...")
             outputs = model_obj(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss / accumulation_steps  # Scale loss for gradient accumulation
+            loss = outputs.loss
             print(f"Batch {batch_idx + 1}: Forward pass completed. Loss: {loss.item():.4f}")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
@@ -160,16 +165,14 @@ def fine_tune_model(
             print(f"Batch {batch_idx + 1}: Backward pass completed.")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
-            # Gradient accumulation step
-            if (batch_idx + 1) % accumulation_steps == 0 or (batch_idx + 1) == len(train_loader):
-                print(f"Batch {batch_idx + 1}: Updating model parameters...")
-                optimizer.step()
-                optimizer.zero_grad()
-                print(f"Batch {batch_idx + 1}: Model parameters updated.")
-                print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+            # Optimizer step
+            print(f"Batch {batch_idx + 1}: Updating model parameters...")
+            optimizer.step()
+            print(f"Batch {batch_idx + 1}: Model parameters updated.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
             # Accumulate loss
-            total_loss += loss.item() * accumulation_steps
+            total_loss += loss.item()
             print(f"Batch {batch_idx + 1}: Loss accumulated. Current total loss: {total_loss:.4f}")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
@@ -183,12 +186,13 @@ def fine_tune_model(
 
         # Save checkpoint
         print(f"Saving checkpoint for epoch {epoch + 1}...")
+        # Save only necessary components and use pickle protocol 4 for faster saving
         torch.save({
             'epoch': epoch,
             'model_state_dict': model_obj.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss
-        }, checkpoint_path)
+        }, checkpoint_path, _use_new_zipfile_serialization=False, pickle_protocol=4)
         print(f"Checkpoint for epoch {epoch + 1} saved successfully.")
 
     print("Fine-tuning process completed.")
