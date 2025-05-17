@@ -194,7 +194,7 @@ def fine_tune_model(
                 'model_state_dict': model_obj.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': total_loss
-            }, temp_checkpoint_path, _use_new_zipfile_serialization=False, pickle_protocol=4)
+            }, temp_checkpoint_path)
             # Replace the old checkpoint file with the new one
             os.replace(temp_checkpoint_path, checkpoint_path)
             print(f"Checkpoint for epoch {epoch + 1} saved successfully.")
