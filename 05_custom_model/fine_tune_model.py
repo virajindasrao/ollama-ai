@@ -98,9 +98,10 @@ def fine_tune_model(
     train_data: Dataset,
     output_folder: str,
     epochs: int = 3,
-    batch_size: int = 8,
+    batch_size: int = 4,  # Reduce batch size to save memory
     learning_rate: float = 5e-5,
-    checkpoint_dir: str = "checkpoints"
+    checkpoint_dir: str = "checkpoints",
+    accumulation_steps: int = 2  # Enable gradient accumulation
 ):
     print("Starting fine-tuning process...")
     device = torch.device("cpu")  # Force CPU-only execution
@@ -146,16 +147,10 @@ def fine_tune_model(
             print(f"Batch {batch_idx + 1}: Input data moved to device successfully.")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
-            # Zero gradients
-            print(f"Batch {batch_idx + 1}: Zeroing gradients...")
-            optimizer.zero_grad()
-            print(f"Batch {batch_idx + 1}: Gradients zeroed.")
-            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
-
             # Forward pass
             print(f"Batch {batch_idx + 1}: Performing forward pass...")
             outputs = model_obj(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss
+            loss = outputs.loss / accumulation_steps  # Scale loss for gradient accumulation
             print(f"Batch {batch_idx + 1}: Forward pass completed. Loss: {loss.item():.4f}")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
@@ -165,14 +160,16 @@ def fine_tune_model(
             print(f"Batch {batch_idx + 1}: Backward pass completed.")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
-            # Optimizer step
-            print(f"Batch {batch_idx + 1}: Updating model parameters...")
-            optimizer.step()
-            print(f"Batch {batch_idx + 1}: Model parameters updated.")
-            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+            # Gradient accumulation step
+            if (batch_idx + 1) % accumulation_steps == 0 or (batch_idx + 1) == len(train_loader):
+                print(f"Batch {batch_idx + 1}: Updating model parameters...")
+                optimizer.step()
+                optimizer.zero_grad()
+                print(f"Batch {batch_idx + 1}: Model parameters updated.")
+                print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
             # Accumulate loss
-            total_loss += loss.item()
+            total_loss += loss.item() * accumulation_steps
             print(f"Batch {batch_idx + 1}: Loss accumulated. Current total loss: {total_loss:.4f}")
             print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
