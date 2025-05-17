@@ -9,6 +9,18 @@ import argparse
 
 from transformers import logging
 
+# Check for CUDA library availability
+if torch.cuda.is_available():
+    try:
+        torch.cuda.init()
+    except OSError as e:
+        print(f"CUDA initialization error: {e}")
+        print("Ensure that the required CUDA libraries (e.g., libcudart.so.11.0) are installed and accessible.")
+        print("Falling back to CPU execution.")
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+else:
+    print("CUDA is not available. The script will run on CPU.")
+
 # Set Hugging Face API token from environment variable
 HfFolder.save_token('<your token goes here>')
 
