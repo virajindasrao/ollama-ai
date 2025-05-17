@@ -1,7 +1,6 @@
 import os
 import json
 import torch
-import ctypes
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from huggingface_hub import HfFolder
@@ -10,27 +9,8 @@ import argparse
 
 from transformers import logging
 
-# Check for CUDA library availability
-if torch.cuda.is_available():
-    try:
-        # Attempt to load CUDA dependencies
-        torch.cuda.init()
-        cuda_libs = ["libcudart.so.11.0", "libcusparseLt.so"]
-        for lib in cuda_libs:
-            found = False
-            for path in os.environ.get("LD_LIBRARY_PATH", "").split(":") + ["/usr/lib/x86_64-linux-gnu", "/usr/local/cuda/lib64"]:
-                if os.path.exists(os.path.join(path, lib)):
-                    ctypes.CDLL(os.path.join(path, lib), mode=ctypes.RTLD_GLOBAL)
-                    found = True
-                    break
-            if not found:
-                print(f"Warning: {lib} not found in system paths. Ensure it is installed and accessible.")
-    except (OSError, ValueError) as e:
-        print(f"CUDA initialization error: {e}")
-        print("Falling back to CPU execution.")
-        os.environ["CUDA_VISIBLE_DEVICES"] = ""
-else:
-    print("CUDA is not available. The script will run on CPU.")
+# Remove GPU-related checks and ensure CPU-only execution
+print("The script will run on CPU only.")
 
 # Set Hugging Face API token from environment variable
 HfFolder.save_token(os.environ.get("HUGGINGFACE_TOKEN", ""))
@@ -102,11 +82,8 @@ def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelFor
         raise
 
     try:
-        model_obj = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            device_map="auto"  # Automatically map model layers to available devices
-        )
-        print("Model loaded successfully with device_map='auto'.")
+        model_obj = AutoModelForCausalLM.from_pretrained(model_id)
+        print("Model loaded successfully.")
     except Exception as e:
         print(f"Error loading model: {e}")
         raise
@@ -124,7 +101,7 @@ def fine_tune_model(
     checkpoint_dir: str = "checkpoints"
 ):
     print("Starting fine-tuning process...")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")  # Force CPU-only execution
 
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
     optimizer = torch.optim.AdamW(model_obj.parameters(), lr=learning_rate)
@@ -135,7 +112,7 @@ def fine_tune_model(
     checkpoint_path = os.path.join(checkpoint_dir, "checkpoint.pth")
     if os.path.exists(checkpoint_path):
         print(f"Loading checkpoint from {checkpoint_path}...")
-        checkpoint = torch.load(checkpoint_path)
+        checkpoint = torch.load(checkpoint_path, map_location=device)
         model_obj.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
