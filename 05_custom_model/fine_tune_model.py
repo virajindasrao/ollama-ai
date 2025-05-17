@@ -15,14 +15,16 @@ if torch.cuda.is_available():
     try:
         # Attempt to load CUDA dependencies
         torch.cuda.init()
-        try:
-            ctypes.CDLL("libcudart.so.11.0", mode=ctypes.RTLD_GLOBAL)
-        except OSError:
-            print("Warning: libcudart.so.11.0 not found. Ensure it is installed and accessible.")
-        try:
-            ctypes.CDLL("libcusparseLt.so", mode=ctypes.RTLD_GLOBAL)
-        except OSError:
-            print("Warning: libcusparseLt.so not found. Ensure it is installed and accessible.")
+        cuda_libs = ["libcudart.so.11.0", "libcusparseLt.so"]
+        for lib in cuda_libs:
+            found = False
+            for path in os.environ.get("LD_LIBRARY_PATH", "").split(":") + ["/usr/lib/x86_64-linux-gnu", "/usr/local/cuda/lib64"]:
+                if os.path.exists(os.path.join(path, lib)):
+                    ctypes.CDLL(os.path.join(path, lib), mode=ctypes.RTLD_GLOBAL)
+                    found = True
+                    break
+            if not found:
+                print(f"Warning: {lib} not found in system paths. Ensure it is installed and accessible.")
     except (OSError, ValueError) as e:
         print(f"CUDA initialization error: {e}")
         print("Falling back to CPU execution.")
