@@ -14,12 +14,19 @@ def chat_with_model(model_dir: str):
             print("Exiting chat session.")
             break
 
-        # Tokenize user input
-        inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True)
+        # Tokenize user input with explicit max_length and attention_mask
+        inputs = tokenizer(
+            user_input,
+            return_tensors="pt",
+            truncation=True,
+            padding="max_length",
+            max_length=512  # Explicitly set max_length
+        )
 
-        # Generate response
+        # Generate response with attention_mask
         outputs = model.generate(
             inputs["input_ids"],
+            attention_mask=inputs["attention_mask"],  # Explicitly pass attention_mask
             max_length=512,
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
@@ -41,4 +48,4 @@ if __name__ == "__main__":
         print(f"Model directory {model_directory} exists.")
         # Start the chat session with the fine-tuned model
         print('starting chat')
-    chat_with_model(model_directory)
+        chat_with_model(model_directory)
