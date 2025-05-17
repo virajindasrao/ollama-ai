@@ -6,6 +6,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from huggingface_hub import HfFolder
 from typing import Tuple
 import argparse
+import psutil  # Add this import to monitor system resources
 
 from transformers import logging
 
@@ -136,22 +137,49 @@ def fine_tune_model(
 
         for batch_idx, batch in enumerate(train_loader):
             print(f"Processing batch {batch_idx + 1}/{len(train_loader)}...")
+
+            # Log input data details
+            print(f"Batch {batch_idx + 1}: Moving input data to device...")
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
+            print(f"Batch {batch_idx + 1}: Input data moved to device successfully.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
+            # Zero gradients
+            print(f"Batch {batch_idx + 1}: Zeroing gradients...")
             optimizer.zero_grad()
+            print(f"Batch {batch_idx + 1}: Gradients zeroed.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+
+            # Forward pass
+            print(f"Batch {batch_idx + 1}: Performing forward pass...")
             outputs = model_obj(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
             loss = outputs.loss
-            print(f"Batch {batch_idx + 1} loss: {loss.item():.4f}")
-            loss.backward()
-            optimizer.step()
+            print(f"Batch {batch_idx + 1}: Forward pass completed. Loss: {loss.item():.4f}")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
+            # Backward pass
+            print(f"Batch {batch_idx + 1}: Performing backward pass...")
+            loss.backward()
+            print(f"Batch {batch_idx + 1}: Backward pass completed.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+
+            # Optimizer step
+            print(f"Batch {batch_idx + 1}: Updating model parameters...")
+            optimizer.step()
+            print(f"Batch {batch_idx + 1}: Model parameters updated.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+
+            # Accumulate loss
             total_loss += loss.item()
+            print(f"Batch {batch_idx + 1}: Loss accumulated. Current total loss: {total_loss:.4f}")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
             # Log progress for every 10 batches
             if (batch_idx + 1) % 10 == 0:
                 print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_loader)}, Loss: {loss.item():.4f}")
+                print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
         avg_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch + 1}/{epochs} completed. Average Loss: {avg_loss:.4f}")
