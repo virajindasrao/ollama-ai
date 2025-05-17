@@ -27,7 +27,7 @@ def chat_with_model(model_dir: str):
         outputs = model.generate(
             inputs["input_ids"],
             attention_mask=inputs["attention_mask"],  # Explicitly pass attention_mask
-            max_length=512,
+            max_new_tokens=50,  # Limit the number of new tokens generated
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id
