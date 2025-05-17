@@ -32,7 +32,3 @@
     "completion": " Yes, XYZ Corp provides AWS Well-Architected Framework assessments to ensure your cloud architecture follows best practices in reliability, security, performance, cost optimization, and operational excellence."
   }
 ]
-
-
-
-python ./test.py --model_name mistralai/Mistral-7B-v0.1 --data_path ./data.json --output_dir ./fine_tuned_model --epochs 3 --batch_size 8 --learning_rate 5e-5
