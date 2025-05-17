@@ -119,16 +119,12 @@ def fine_tune_model(
     os.makedirs(checkpoint_dir, exist_ok=True)
     checkpoint_path = os.path.join(checkpoint_dir, "checkpoint.pth")
     if os.path.exists(checkpoint_path):
-        try:
-            print(f"Loading checkpoint from {checkpoint_path}...")
-            checkpoint = torch.load(checkpoint_path, map_location=device)
-            model_obj.load_state_dict(checkpoint['model_state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            start_epoch = checkpoint['epoch'] + 1
-            print(f"Resuming training from epoch {start_epoch}.")
-        except Exception as e:
-            print(f"Error loading checkpoint: {e}. Starting training from scratch.")
-            start_epoch = 0
+        print(f"Loading checkpoint from {checkpoint_path}...")
+        checkpoint = torch.load(checkpoint_path, map_location=device)
+        model_obj.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        start_epoch = checkpoint['epoch'] + 1
+        print(f"Resuming training from epoch {start_epoch}.")
     else:
         print("No checkpoint found. Starting training from scratch.")
 
@@ -188,25 +184,27 @@ def fine_tune_model(
         avg_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch + 1}/{epochs} completed. Average Loss: {avg_loss:.4f}")
 
-        # Save checkpointporary file first
+        # Save checkpoint
         print(f"Saving checkpoint for epoch {epoch + 1}...")
         temp_checkpoint_path = checkpoint_path + ".tmp"
-        try:ict': model_obj.state_dict(),
+        try:
+            # Save to a temporary file first
             torch.save({
                 'epoch': epoch,
-                'model_state_dict': model_obj.state_dict(),            }, temp_checkpoint_path, _use_new_zipfile_serialization=False, pickle_protocol=4)
-                'optimizer_state_dict': optimizer.state_dict(),le with the new one
-                'loss': total_loss            os.replace(temp_checkpoint_path, checkpoint_path)
-            }, temp_checkpoint_path, _use_new_zipfile_serialization=False, pickle_protocol=4)for epoch {epoch + 1} saved successfully.")
+                'model_state_dict': model_obj.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss': total_loss
+            }, temp_checkpoint_path, _use_new_zipfile_serialization=False, pickle_protocol=4)
+            # Replace the old checkpoint file with the new one
             os.replace(temp_checkpoint_path, checkpoint_path)
-            print(f"Checkpoint for epoch {epoch + 1} saved successfully."){e}")
-        except Exception as e:t_path):
+            print(f"Checkpoint for epoch {epoch + 1} saved successfully.")
+        except Exception as e:
             print(f"Error saving checkpoint: {e}")
             if os.path.exists(temp_checkpoint_path):
-                os.remove(temp_checkpoint_path)    print("Fine-tuning process completed.")
+                os.remove(temp_checkpoint_path)
 
     print("Fine-tuning process completed.")
-    print(f"Saving fine-tuned model and tokenizer to {output_folder}...")
+
     # Save the fine-tuned model
     print(f"Saving fine-tuned model and tokenizer to {output_folder}...")
     os.makedirs(output_folder, exist_ok=True)
@@ -215,47 +213,39 @@ def fine_tune_model(
     print("Model and tokenizer saved successfully.")
 
 if __name__ == "__main__":
-    logging.set_verbosity_info()Parser(description="Fine-tune a Hugging Face model.")
+    logging.set_verbosity_info()
+
+    parser = argparse.ArgumentParser(description="Fine-tune a Hugging Face model.")
     parser.add_argument("--model_name", type=str, required=True, help="Model name or path")
-    parser = argparse.ArgumentParser(description="Fine-tune a Hugging Face model.")=str, required=True, help="Path to the training data")
-    parser.add_argument("--model_name", type=str, required=True, help="Model name or path")put_dir", type=str, default="fine_tuned_model", help="Output directory")
-    parser.add_argument("--data_path", type=str, required=True, help="Path to the training data")umber of training epochs")
-    parser.add_argument("--output_dir", type=str, default="fine_tuned_model", help="Output directory")ault=8, help="Batch size")
-    parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")    parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
+    parser.add_argument("--data_path", type=str, required=True, help="Path to the training data")
+    parser.add_argument("--output_dir", type=str, default="fine_tuned_model", help="Output directory")
+    parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
-    parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")se_args()
+    parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
 
     args = parser.parse_args()
-    # Load tokenizer and model
-    print("Loading tokenizer and model...")e)
+
+    print("Loading tokenizer and model...")
     # Load tokenizer and model
     tokenizer, model = load_model_and_tokenizer(args.model_name)
     print("Tokenizer and model loaded successfully.")
 
-    print("Preparing dataset...")CustomDataset(args.data_path, tokenizer)
-    # Prepare datasetaset prepared successfully.")
+    print("Preparing dataset...")
+    # Prepare dataset
     train_dataset = CustomDataset(args.data_path, tokenizer)
-    print("Dataset prepared successfully.")t directory is set to 'fine_tuned_model'
-.path.join(os.path.dirname(__file__), 'fine_tuned_model')
-    # Ensure the output directory is set to 'fine_tuned_model'
-    output_folder = os.path.join(os.path.dirname(__file__), 'fine_tuned_model')cess...")
+    print("Dataset prepared successfully.")
 
-    print("Starting fine-tuning process...")ine_tune_model(
+    # Ensure the output directory is set to 'fine_tuned_model'
+    output_folder = os.path.join(os.path.dirname(__file__), 'fine_tuned_model')
+
+    print("Starting fine-tuning process...")
     # Fine-tune the model
-    fine_tune_model(        tokenizer,
+    fine_tune_model(
         model,
         tokenizer,
-
-
-
-
-
-
-
-
-
-
-    print("Model and tokenizer saved successfully.")    print(f"Saving fine-tuned model and tokenizer to {output_folder}...")    print("Fine-tuning process completed.")    )        learning_rate=args.learning_rate        batch_size=args.batch_size,        epochs=args.epochs,        output_folder,        train_dataset,        epochs=args.epochs,
+        train_dataset,
+        output_folder,
+        epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate
     )
