@@ -14,9 +14,12 @@ def chat_with_model(model_dir: str):
             print("Exiting chat session.")
             break
 
+        # Prepend special tokens to user input
+        formatted_input = f"<|input|>{user_input}<|endofinput|>"
+
         # Tokenize user input with explicit max_length and attention_mask
         inputs = tokenizer(
-            user_input,
+            formatted_input,
             return_tensors="pt",
             truncation=True,
             padding="max_length",
@@ -36,8 +39,11 @@ def chat_with_model(model_dir: str):
             top_k=50         # Limit to top-k tokens
         )
 
-        # Decode and print the response
+        # Decode and print the response, removing special tokens
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # Extract the response after the <|output|> token
+        if "<|output|>" in response:
+            response = response.split("<|output|>")[1].strip()
         print(f"Model: {response}")
 
 if __name__ == "__main__":

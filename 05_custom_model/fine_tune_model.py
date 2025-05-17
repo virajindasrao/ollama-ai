@@ -38,16 +38,14 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx: int) -> dict:
         item = self.data[idx]
 
-        # Handle both 'input'/'output' and 'prompt'/'completion' keys
-        if 'input' in item and 'output' in item:
-            input_text = item['input']
-            target_text = item['output']
-        elif 'prompt' in item and 'completion' in item:
-            input_text = item['prompt']
-            target_text = item['completion']
+        # Extract 'prompt' and 'completion' keys
+        if 'prompt' in item and 'completion' in item:
+            input_text = f"<|input|>{item['prompt']}<|endofinput|>"
+            target_text = f"<|output|>{item['completion']}<|endofoutput|>"
         else:
-            raise KeyError(f"Missing required keys in dataset item at index {idx}. Expected keys: 'input'/'output' or 'prompt'/'completion'.")
+            raise KeyError(f"Missing required keys in dataset item at index {idx}. Expected keys: 'prompt' and 'completion'.")
 
+        # Tokenize input and target
         inputs = self.tokenizer(
             input_text,
             max_length=self.max_length,
@@ -75,6 +73,11 @@ def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelFor
         tokenizer_obj = AutoTokenizer.from_pretrained(model_id)
         print(f"Tokenizer loaded successfully: {model_id}")
 
+        # Add special tokens if not already present
+        special_tokens = {"additional_special_tokens": ["<|input|>", "<|endofinput|>", "<|output|>", "<|endofoutput|>"]}
+        tokenizer_obj.add_special_tokens(special_tokens)
+        print("Special tokens added to tokenizer.")
+
         # Set pad_token to eos_token if not already set
         if tokenizer_obj.pad_token is None:
             tokenizer_obj.pad_token = tokenizer_obj.eos_token
@@ -85,6 +88,7 @@ def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelFor
 
     try:
         model_obj = AutoModelForCausalLM.from_pretrained(model_id)
+        model_obj.resize_token_embeddings(len(tokenizer_obj))  # Resize embeddings for new tokens
         print("Model loaded successfully.")
     except Exception as e:
         print(f"Error loading model: {e}")
