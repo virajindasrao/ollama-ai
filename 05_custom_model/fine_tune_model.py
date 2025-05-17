@@ -1,6 +1,7 @@
 import os
 import json
 import torch
+import ctypes
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from huggingface_hub import HfFolder
@@ -12,10 +13,18 @@ from transformers import logging
 # Check for CUDA library availability
 if torch.cuda.is_available():
     try:
+        # Attempt to load CUDA dependencies
         torch.cuda.init()
-    except OSError as e:
+        try:
+            ctypes.CDLL("libcudart.so.11.0", mode=ctypes.RTLD_GLOBAL)
+        except OSError:
+            print("Warning: libcudart.so.11.0 not found. Ensure it is installed and accessible.")
+        try:
+            ctypes.CDLL("libcusparseLt.so", mode=ctypes.RTLD_GLOBAL)
+        except OSError:
+            print("Warning: libcusparseLt.so not found. Ensure it is installed and accessible.")
+    except (OSError, ValueError) as e:
         print(f"CUDA initialization error: {e}")
-        print("Ensure that the required CUDA libraries (e.g., libcudart.so.11.0) are installed and accessible.")
         print("Falling back to CPU execution.")
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
 else:
