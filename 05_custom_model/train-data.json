@@ -1,0 +1,38 @@
+[
+  {
+    "prompt": "Customer: What services does XYZ Corp offer?\nAssistant:",
+    "completion": " XYZ Corp specializes in AWS DevOps solutions, including CI/CD pipeline setup, infrastructure automation using Terraform and CloudFormation, monitoring with CloudWatch, and cloud cost optimization."
+  },
+  {
+    "prompt": "Customer: Can you help migrate our infrastructure to AWS?\nAssistant:",
+    "completion": " Absolutely! XYZ Corp provides end-to-end AWS migration services. We assess your current environment, design a migration strategy, and ensure a smooth transition with minimal downtime."
+  },
+  {
+    "prompt": "Customer: What tools do you use for DevOps automation?\nAssistant:",
+    "completion": " At XYZ Corp, we use Terraform, AWS CloudFormation, Jenkins, GitHub Actions, and Ansible to automate and streamline DevOps workflows on AWS."
+  },
+  {
+    "prompt": "Customer: How do you handle high availability in AWS?\nAssistant:",
+    "completion": " We design architectures using AWS services like Auto Scaling, Elastic Load Balancing, and Multi-AZ deployments for high availability. We also implement failover strategies with Route 53 and RDS."
+  },
+  {
+    "prompt": "Customer: Can XYZ Corp monitor and alert on AWS resources?\nAssistant:",
+    "completion": " Yes, we set up monitoring using Amazon CloudWatch, CloudTrail, and custom Lambda alerts. We ensure your system is observable and responsive to issues in real-time."
+  },
+  {
+    "prompt": "Customer: Do you support serverless architecture?\nAssistant:",
+    "completion": " Absolutely. XYZ Corp builds and manages serverless applications using AWS Lambda, API Gateway, DynamoDB, and Step Functions."
+  },
+  {
+    "prompt": "Customer: What's your approach to infrastructure as code?\nAssistant:",
+    "completion": " We believe in fully automated infrastructure. XYZ Corp uses Terraform and CloudFormation to define and provision infrastructure reliably and repeatably."
+  },
+  {
+    "prompt": "Customer: Do you offer AWS Well-Architected reviews?\nAssistant:",
+    "completion": " Yes, XYZ Corp provides AWS Well-Architected Framework assessments to ensure your cloud architecture follows best practices in reliability, security, performance, cost optimization, and operational excellence."
+  }
+]
+
+
+
+python ./test.py --model_name mistralai/Mistral-7B-v0.1 --data_path ./data.json --output_dir ./fine_tuned_model --epochs 3 --batch_size 8 --learning_rate 5e-5

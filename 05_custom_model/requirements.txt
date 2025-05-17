@@ -1,0 +1,6 @@
+tf_keras
+datasets
+transformers
+peft
+trl
+torch
