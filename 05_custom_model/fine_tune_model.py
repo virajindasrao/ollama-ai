@@ -9,7 +9,8 @@ import argparse
 
 from transformers import logging
 
-# Remove GPU-related checks and ensure CPU-only execution
+# Ensure CPU-only execution
+os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Disable GPU visibility
 print("The script will run on CPU only.")
 
 # Set Hugging Face API token from environment variable
