@@ -199,6 +199,13 @@ def fine_tune_model(
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': total_loss
             }, temp_checkpoint_path)
+            # Verify the temporary file size before replacing the old checkpoint
+            if os.path.exists(temp_checkpoint_path):
+                temp_file_size = os.path.getsize(temp_checkpoint_path)
+                print(f"Temporary checkpoint file size: {temp_file_size} bytes")
+            else:
+                raise RuntimeError("Temporary checkpoint file was not created.")
+
             # Replace the old checkpoint file with the new one
             os.replace(temp_checkpoint_path, checkpoint_path)
             print(f"Checkpoint for epoch {epoch + 1} saved successfully.")
@@ -206,6 +213,7 @@ def fine_tune_model(
             print(f"Error saving checkpoint: {e}")
             if os.path.exists(temp_checkpoint_path):
                 os.remove(temp_checkpoint_path)
+                print("Temporary checkpoint file removed due to error.")
 
     print("Fine-tuning process completed.")
 
