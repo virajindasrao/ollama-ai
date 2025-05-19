@@ -36,7 +36,8 @@ def chat_with_model(model_dir: str):
             eos_token_id=tokenizer.eos_token_id,
             temperature=0.7,  # Add randomness to the output
             top_p=0.9,       # Use nucleus sampling
-            top_k=50         # Limit to top-k tokens
+            top_k=50,        # Limit to top-k tokens
+            do_sample=True   # Enable sampling-based generation
         )
         print(f"Generated token IDs: {outputs}")
         # Decode and print the response, removing special tokens
