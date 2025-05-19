@@ -26,6 +26,7 @@ def chat_with_model(model_dir: str):
             max_length=512  # Explicitly set max_length
         )
         print(f"Tokenized input: {inputs}")
+
         # Generate response with attention_mask and adjusted decoding parameters
         outputs = model.generate(
             inputs["input_ids"],
@@ -40,23 +41,24 @@ def chat_with_model(model_dir: str):
             do_sample=True   # Enable sampling-based generation
         )
         print(f"Generated token IDs: {outputs}")
+
         # Decode and print the response, removing special tokens
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         print(f"Decoded response: {response}")
+
         # Extract the response after the <|output|> token
         if "<|output|>" in response:
-            response = response.split("<|output|>")[1].strip()
+            response = response.split("<|output|>")[1].split("<|endofoutput|>")[0].strip()
         print(f"Model: {response}")
 
 if __name__ == "__main__":
     # Path to the fine-tuned model directory
-    print('initializing chat')
-    print('loading model')  
+    print('Initializing chat...')
     model_directory = os.path.join(os.path.dirname(__file__), "fine_tuned_model")
     if not os.path.exists(model_directory):
         print(f"Model directory {model_directory} does not exist.")
     else:
         print(f"Model directory {model_directory} exists.")
         # Start the chat session with the fine-tuned model
-        print('starting chat')
+        print('Starting chat...')
         chat_with_model(model_directory)

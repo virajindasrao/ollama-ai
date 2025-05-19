@@ -40,8 +40,8 @@ class CustomDataset(Dataset):
 
         # Extract 'prompt' and 'completion' keys
         if 'prompt' in item and 'completion' in item:
-            input_text = f"<|input|>{item['prompt']}<|endofinput|>"
-            target_text = f"<|output|>{item['completion']}<|endofoutput|>"
+            input_text = f"### Instruction:\n{item['prompt']}\n\n### Response:\n"
+            target_text = f"{item['completion']}"
         else:
             raise KeyError(f"Missing required keys in dataset item at index {idx}. Expected keys: 'prompt' and 'completion'.")
 
@@ -61,11 +61,34 @@ class CustomDataset(Dataset):
             return_tensors="pt"
         )
 
+        # Concatenate input and target
+        input_ids = inputs['input_ids'].squeeze(0)
+        labels = targets['input_ids'].squeeze(0)
+
+        # Create a new input that is the full prompt + completion
+        input_ids_full = torch.cat([input_ids, labels], dim=0)
+
+        # Create attention mask accordingly
+        attention_mask_full = torch.ones_like(input_ids_full)
+
+        # Create labels: only the target part should have labels; others should be -100
+        labels_full = torch.cat([
+            torch.full_like(input_ids, -100),  # ignore loss on input
+            labels  # compute loss only on output
+        ], dim=0)
+
+        # Truncate if needed
+        max_len = self.max_length
+        input_ids_full = input_ids_full[:max_len]
+        attention_mask_full = attention_mask_full[:max_len]
+        labels_full = labels_full[:max_len]
+
         return {
-            'input_ids': inputs['input_ids'].squeeze(0),
-            'attention_mask': inputs['attention_mask'].squeeze(0),
-            'labels': targets['input_ids'].squeeze(0)
+            'input_ids': input_ids_full,
+            'attention_mask': attention_mask_full,
+            'labels': labels_full
         }
+
 
 def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelForCausalLM]:
     print("Loading tokenizer and model...")
