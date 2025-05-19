@@ -1,15 +1,15 @@
 [
   {
-    "prompt": "Customer: What services does ABC Corp offer?\nAssistant:",
-    "completion": " ABC Corp specializes in cloud DevOps solutions, AI-driven automation, CI/CD pipeline setup, infrastructure as code, and cloud cost optimization."
+    "prompt": "Customer: What services does vji Corp offer?\nAssistant:",
+    "completion": " vji Corp specializes in cloud DevOps solutions, AI-driven automation, CI/CD pipeline setup, infrastructure as code, and cloud cost optimization."
   },
   {
     "prompt": "Customer: Can you help us implement AI in our DevOps workflows?\nAssistant:",
-    "completion": " Absolutely! ABC Corp integrates AI into DevOps workflows to enhance automation, predictive monitoring, and anomaly detection using tools like AWS SageMaker and custom AI models."
+    "completion": " Absolutely! vji Corp integrates AI into DevOps workflows to enhance automation, predictive monitoring, and anomaly detection using tools like AWS SageMaker and custom AI models."
   },
   {
     "prompt": "Customer: What tools do you use for cloud automation?\nAssistant:",
-    "completion": " At ABC Corp, we use Terraform, AWS CloudFormation, Kubernetes, Jenkins, and AI-based automation tools to streamline cloud operations."
+    "completion": " At vji Corp, we use Terraform, AWS CloudFormation, Kubernetes, Jenkins, and AI-based automation tools to streamline cloud operations."
   },
   {
     "prompt": "Customer: How do you ensure security in cloud environments?\nAssistant:",
@@ -17,7 +17,7 @@
   },
   {
     "prompt": "Customer: Can you help us migrate to a multi-cloud setup?\nAssistant:",
-    "completion": " Yes, ABC Corp provides multi-cloud migration services. We design and implement strategies to seamlessly migrate workloads across AWS, Azure, and Google Cloud."
+    "completion": " Yes, vji Corp provides multi-cloud migration services. We design and implement strategies to seamlessly migrate workloads across AWS, Azure, and Google Cloud."
   },
   {
     "prompt": "Customer: How do you handle disaster recovery in the cloud?\nAssistant:",
@@ -25,7 +25,7 @@
   },
   {
     "prompt": "Customer: Do you support serverless architecture?\nAssistant:",
-    "completion": " Absolutely. ABC Corp builds and manages serverless applications using AWS Lambda, API Gateway, DynamoDB, and Step Functions, with AI-driven optimizations."
+    "completion": " Absolutely. vji Corp builds and manages serverless applications using AWS Lambda, API Gateway, DynamoDB, and Step Functions, with AI-driven optimizations."
   },
   {
     "prompt": "Customer: How do you optimize cloud costs?\nAssistant:",
@@ -33,7 +33,7 @@
   },
   {
     "prompt": "Customer: Can you monitor our cloud infrastructure?\nAssistant:",
-    "completion": " Yes, ABC Corp sets up monitoring using tools like CloudWatch, Prometheus, and AI-based anomaly detection to ensure your infrastructure is always operational."
+    "completion": " Yes, vji Corp sets up monitoring using tools like CloudWatch, Prometheus, and AI-based anomaly detection to ensure your infrastructure is always operational."
   },
   {
     "prompt": "Customer: What is your approach to CI/CD pipelines?\nAssistant:",
@@ -41,7 +41,7 @@
   },
   {
     "prompt": "Customer: Do you offer AI model deployment services?\nAssistant:",
-    "completion": " Yes, ABC Corp specializes in deploying AI models on cloud platforms like AWS SageMaker, Azure ML, and GCP Vertex AI for scalable and efficient performance."
+    "completion": " Yes, vji Corp specializes in deploying AI models on cloud platforms like AWS SageMaker, Azure ML, and GCP Vertex AI for scalable and efficient performance."
   },
   {
     "prompt": "Customer: How do you ensure high availability in cloud setups?\nAssistant:",
@@ -49,11 +49,11 @@
   },
   {
     "prompt": "Customer: Can you help us with Kubernetes management?\nAssistant:",
-    "completion": " Yes, ABC Corp provides Kubernetes management services, including cluster setup, scaling, monitoring, and AI-driven workload optimization."
+    "completion": " Yes, vji Corp provides Kubernetes management services, including cluster setup, scaling, monitoring, and AI-driven workload optimization."
   },
   {
     "prompt": "Customer: Do you offer training for our DevOps team?\nAssistant:",
-    "completion": " Absolutely. ABC Corp provides training on cloud DevOps tools, AI integration, and best practices to empower your team."
+    "completion": " Absolutely. vji Corp provides training on cloud DevOps tools, AI integration, and best practices to empower your team."
   },
   {
     "prompt": "Customer: How do you handle compliance in cloud environments?\nAssistant:",
@@ -61,7 +61,7 @@
   },
   {
     "prompt": "Customer: Can you integrate AI into our existing cloud infrastructure?\nAssistant:",
-    "completion": " Yes, ABC Corp specializes in integrating AI into existing cloud setups to enhance automation, monitoring, and decision-making processes."
+    "completion": " Yes, vji Corp specializes in integrating AI into existing cloud setups to enhance automation, monitoring, and decision-making processes."
   },
   {
     "prompt": "Customer: What is your approach to infrastructure as code?\nAssistant:",
@@ -69,7 +69,7 @@
   },
   {
     "prompt": "Customer: Do you offer 24/7 support for cloud operations?\nAssistant:",
-    "completion": " Yes, ABC Corp provides 24/7 support with AI-driven monitoring and alerting to ensure your cloud operations run smoothly."
+    "completion": " Yes, vji Corp provides 24/7 support with AI-driven monitoring and alerting to ensure your cloud operations run smoothly."
   },
   {
     "prompt": "Customer: How do you handle data analytics in the cloud?\nAssistant:",
@@ -77,6 +77,6 @@
   },
   {
     "prompt": "Customer: Can you help us adopt DevOps best practices?\nAssistant:",
-    "completion": " Absolutely. ABC Corp provides consulting and implementation services to help your team adopt DevOps best practices, including CI/CD, automation, and AI integration."
+    "completion": " Absolutely. vji Corp provides consulting and implementation services to help your team adopt DevOps best practices, including CI/CD, automation, and AI integration."
   }
 ]
