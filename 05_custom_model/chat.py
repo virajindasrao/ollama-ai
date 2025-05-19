@@ -25,7 +25,6 @@ def chat_with_model(model_dir: str):
             padding="max_length",
             max_length=512  # Explicitly set max_length
         )
-        print(f"Tokenized input: {inputs}")
 
         # Generate response with attention_mask and adjusted decoding parameters
         outputs = model.generate(
@@ -40,7 +39,6 @@ def chat_with_model(model_dir: str):
             top_k=50,        # Limit to top-k tokens
             do_sample=True   # Enable sampling-based generation
         )
-        print(f"Generated token IDs: {outputs}")
 
         # Decode and print the response, removing special tokens
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -49,7 +47,9 @@ def chat_with_model(model_dir: str):
         # Extract the response after the <|output|> token
         if "<|output|>" in response:
             response = response.split("<|output|>")[1].split("<|endofoutput|>")[0].strip()
+        print(f"=====================================")
         print(f"Model: {response}")
+        print(f"=====================================")
 
 if __name__ == "__main__":
     # Path to the fine-tuned model directory
