@@ -38,12 +38,13 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx: int) -> dict:
         item = self.data[idx]
 
-        # Extract 'prompt' and 'completion' keys
-        if 'prompt' in item and 'completion' in item:
-            input_text = f"### Instruction:\n{item['prompt']}\n\n### Response:\n"
-            target_text = f"{item['completion']}"
+        if 'instruction' in item and 'response' in item:
+            input_text = f"### Instruction:\n{item['instruction']}\n\n### Response:\n"
+            target_text = f"{item['response']}"
         else:
-            raise KeyError(f"Missing required keys in dataset item at index {idx}. Expected keys: 'prompt' and 'completion'.")
+            print(f"Skipping item at index {idx} due to missing keys. Item: {item}")
+            # Optionally, you can raise or return a dummy example, but here we raise to avoid silent errors
+            raise KeyError(f"Missing required keys in dataset item at index {idx}. Expected keys: 'prompt' and 'completion'.\nItem: {item}")
 
         # Tokenize input and target
         inputs = self.tokenizer(
