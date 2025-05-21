@@ -80,6 +80,8 @@ def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelFor
     try:
         tokenizer_obj = AutoTokenizer.from_pretrained(model_id)
         print(f"Tokenizer loaded successfully: {model_id}")
+        print(f"Tokenizer vocab size: {tokenizer_obj.vocab_size}")
+        print(f"Tokenizer special tokens: {tokenizer_obj.special_tokens_map}")
 
         # Add special tokens if not already present
         special_tokens = {"additional_special_tokens": ["<|input|>", "<|endofinput|>", "<|output|>", "<|endofoutput|>"]}
