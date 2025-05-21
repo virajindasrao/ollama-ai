@@ -8,48 +8,52 @@ def chat_with_model(model_dir: str):
     print("Model and tokenizer loaded successfully.")
 
     print("Starting chat session. Type 'exit' to quit.")
+    # Maintain chat history for multi-turn conversations
+    messages = []
     while True:
         user_input = input("You: ")
         if user_input.lower() == "exit":
             print("Exiting chat session.")
             break
 
-        # Prepend special tokens to user input
-        formatted_input = f"<|input|>{user_input}<|endofinput|>"
+        # Add user message to chat history
+        messages.append({"role": "user", "content": user_input})
 
-        # Tokenize user input with explicit max_length and attention_mask
-        inputs = tokenizer(
-            formatted_input,
+        # Use the chat template for encoding
+        inputs = tokenizer.apply_chat_template(
+            messages,
             return_tensors="pt",
+            max_length=1024,
             truncation=True,
-            padding="max_length",
-            max_length=1024  # Increased limit for longer prompts
+            padding="max_length"
         )
 
-        # Generate response with attention_mask and adjusted decoding parameters
         outputs = model.generate(
-            inputs["input_ids"],
-            attention_mask=inputs["attention_mask"],  # Explicitly pass attention_mask
-            max_new_tokens=1024,  # Increased limit for more complete responses
+            inputs,
+            max_new_tokens=1024,
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
-            temperature=0.7,  # Add randomness to the output
-            top_p=0.9,       # Use nucleus sampling
-            top_k=50,        # Limit to top-k tokens
-            do_sample=True   # Enable sampling-based generation
+            temperature=0.7,
+            top_p=0.9,
+            top_k=50,
+            do_sample=True
         )
 
-        # Decode and print the response, removing special tokens
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        print(f"Decoded response: {response}")
+        # Extract only the assistant's latest response
+        # (Assumes the assistant's response is after the last [/INST] or last user message)
+        last_user = messages[-1]["content"]
+        if last_user in response:
+            response = response.split(last_user)[-1].strip()
+        # Optionally, further clean up the response if needed
 
-        # Extract the response after the <|output|> token
-        if "<|output|>" in response:
-            response = response.split("<|output|>")[1].split("<|endofoutput|>")[0].strip()
         print(f"=====================================")
         print(f"Model: {response}")
         print(f"=====================================")
+
+        # Add assistant response to chat history for context in next turn
+        messages.append({"role": "assistant", "content": response})
 
 if __name__ == "__main__":
     # Path to the fine-tuned model directory
