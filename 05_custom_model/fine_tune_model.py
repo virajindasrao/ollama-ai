@@ -38,42 +38,46 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx: int) -> dict:
         item = self.data[idx]
 
-        if 'instruction' in item and 'response' in item:
-            input_text = f"### Instruction:\n{item['instruction']}\n\n### Response:\n"
-            target_text = f"{item['response']}"
+        # Convert prompt/completion to chat format for the template
+        if 'prompt' in item and 'completion' in item:
+            messages = [
+                {"role": "user", "content": item["prompt"]},
+                {"role": "assistant", "content": item["completion"]}
+            ]
+        elif 'instruction' in item and 'response' in item:
+            messages = [
+                {"role": "user", "content": item["instruction"]},
+                {"role": "assistant", "content": item["response"]}
+            ]
         else:
             print(f"Skipping item at index {idx} due to missing keys. Item: {item}")
-            # Optionally, you can raise or return a dummy example, but here we raise to avoid silent errors
-            raise KeyError(f"Missing required keys in dataset item at index {idx}. Expected keys: 'prompt' and 'completion'.\nItem: {item}")
+            raise KeyError(f"Missing required keys in dataset item at index {idx}.")
 
-        # Tokenize input and target
-        inputs = self.tokenizer(
-            input_text,
+        # Use the chat template for encoding
+        encodings = self.tokenizer.apply_chat_template(
+            messages,
+            return_tensors="pt",
             max_length=self.max_length,
             truncation=True,
-            padding='max_length',
-            return_tensors="pt"
-        )
-        targets = self.tokenizer(
-            target_text,
-            max_length=self.max_length,
-            truncation=True,
-            padding='max_length',
-            return_tensors="pt"
+            padding="max_length"
         )
 
-        # Combine input and target for training
-        input_ids = inputs['input_ids'].squeeze(0)
-        labels = targets['input_ids'].squeeze(0)
+        input_ids = encodings[0]
+        attention_mask = (input_ids != self.tokenizer.pad_token_id).long()
 
-        # Create labels: only the target part should have labels; others should be -100
-        labels_full = torch.full_like(input_ids, -100)  # Ignore loss on input
-        labels_full[-len(labels):] = labels  # Compute loss only on output
+        # Labels: ignore loss on user turns (set to -100), compute loss on assistant turns
+        labels = input_ids.clone()
+        # Find assistant message start
+        user_ids = self.tokenizer.apply_chat_template(
+            [messages[0]], return_tensors="pt", max_length=self.max_length, truncation=True, padding="max_length"
+        )[0]
+        user_len = (user_ids != self.tokenizer.pad_token_id).sum().item()
+        labels[:user_len] = -100  # Ignore loss on user part
 
         return {
-            'input_ids': input_ids,
-            'attention_mask': inputs['attention_mask'].squeeze(0),
-            'labels': labels_full
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "labels": labels
         }
 
 def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelForCausalLM]:
