@@ -97,6 +97,18 @@ def load_model_and_tokenizer(model_id: str) -> Tuple[AutoTokenizer, AutoModelFor
         if tokenizer_obj.pad_token is None:
             tokenizer_obj.pad_token = tokenizer_obj.eos_token
             print("pad_token was not set. Using eos_token as pad_token.")
+
+        # Set chat template if not set
+        if not hasattr(tokenizer_obj, "chat_template") or tokenizer_obj.chat_template is None:
+            tokenizer_obj.chat_template = (
+                "{% for message in messages %}"
+                "{% if loop.first %}<s>{% endif %}"
+                "{% if message['role'] == 'user' %}[INST] {{ message['content'] }} [/INST]"
+                "{% elif message['role'] == 'assistant' %} {{ message['content'] }} </s>{% endif %}"
+                "{% endfor %}"
+            )
+            print("Chat template set for tokenizer.")
+
     except Exception as e:
         print(f"Error loading tokenizer: {e}")
         raise
