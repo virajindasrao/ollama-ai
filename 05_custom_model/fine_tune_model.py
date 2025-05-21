@@ -154,23 +154,31 @@ def fine_tune_model(
     model_obj.train()
 
     for epoch in range(start_epoch, epochs):
-        print(f"Starting epoch {epoch + 1}/{epochs}...")
+        print(f"\n========== Epoch {epoch + 1}/{epochs} ==========")
         total_loss = 0
 
         for batch_idx, batch in enumerate(train_loader):
-            print(f"Processing batch {batch_idx + 1}/{len(train_loader)}...")
+            print(f"\n--- Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_loader)} ---")
+            print(f"Batch input_ids shape: {batch['input_ids'].shape}")
+            print(f"Batch attention_mask shape: {batch['attention_mask'].shape}")
+            print(f"Batch labels shape: {batch['labels'].shape}")
 
             # Move input data to device
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
 
+            print("Moved batch to device.")
+            print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
+
             # Zero gradients
             optimizer.zero_grad()
+            print("Zeroed gradients.")
 
             # Forward pass
             outputs = model_obj(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
             loss = outputs.loss
+            print(f"Forward pass done. Loss: {loss.item():.6f}")
 
             # Check for NaN loss
             if torch.isnan(loss):
@@ -179,22 +187,27 @@ def fine_tune_model(
 
             # Backward pass
             loss.backward()
+            print("Backward pass done.")
 
             # Clip gradients to prevent exploding gradients
             torch.nn.utils.clip_grad_norm_(model_obj.parameters(), gradient_clip_value)
+            print("Clipped gradients.")
 
             # Optimizer step
             optimizer.step()
+            print("Optimizer step done.")
 
             # Accumulate loss
             total_loss += loss.item()
+            print(f"Accumulated loss: {total_loss:.6f}")
 
             # Log progress for every 10 batches
-            if (batch_idx + 1) % 10 == 0:
-                print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_loader)}, Loss: {loss.item():.4f}")
+            if (batch_idx + 1) % 10 == 0 or (batch_idx + 1) == len(train_loader):
+                print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_loader)}, Loss: {loss.item():.6f}")
+                print(f"CPU Usage: {psutil.cpu_percent()}%, Memory Usage: {psutil.virtual_memory().percent}%")
 
         avg_loss = total_loss / len(train_loader) if len(train_loader) > 0 else float('inf')
-        print(f"Epoch {epoch + 1}/{epochs} completed. Average Loss: {avg_loss:.4f}")
+        print(f"\n========== Epoch {epoch + 1}/{epochs} completed. Average Loss: {avg_loss:.6f} ==========")
 
         # Save checkpoint
         print(f"Saving checkpoint for epoch {epoch + 1}...")
