@@ -9,3 +9,4 @@ pip install transformers==4.49.0
 pip install psutil
 pip install numpy==1.24.3
 pip install pybind11>=2.12
+pip install --upgrade "jinja2>=3.1.0"
