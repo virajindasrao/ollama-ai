@@ -10,12 +10,15 @@ def chat_with_model(model_dir: str):
     print("Starting chat session. Type 'exit' to quit.")
     # Maintain chat history for multi-turn conversations
     messages = []
+    first_message = True
     while True:
         user_input = input("You: ")
         if user_input.lower() == "exit":
             print("Exiting chat session.")
             break
 
+        if first_message:
+            messages
         # Add user message to chat history
         messages.append({"role": "user", "content": user_input})
 
@@ -41,7 +44,7 @@ def chat_with_model(model_dir: str):
         )
         print(f"Model output (raw): {outputs}")
         # Decode the model output
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        response = tokenizer.decode(outputs[0], skip_special_tokens=False)  # <-- Set to False to see <s>
         print(f"Raw model output: {response}")
 
         # Extract only the assistant's latest response after the last [/INST]
