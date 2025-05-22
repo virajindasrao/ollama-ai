@@ -1,4 +1,5 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
+import os
 
 model_directory = os.path.join(os.path.dirname(__file__), "fine_tuned_model")
 
