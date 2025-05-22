@@ -43,14 +43,14 @@ def chat_with_model(model_dir: str):
         # Decode the model output
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         print(f"Raw model output: {response}")
-        # Extract only the assistant's latest response
-        # (Assumes the assistant's response is after the last [/INST] or last user message)
-        last_user = messages[-1]["content"]
-        print(f"Last user message: {last_user}")
-        # Find the last user message in the response and split
-        if last_user in response:
-            response = response.split(last_user)[-1].strip()
-        # Optionally, further clean up the response if needed
+
+        # Extract only the assistant's latest response after the last [/INST]
+        if "[/INST]" in response:
+            response = response.split("[/INST]")[-1]
+            # Optionally, stop at the next [INST] if present (for multi-turn)
+            if "[INST]" in response:
+                response = response.split("[INST]")[0]
+        response = response.strip()
 
         print(f"=====================================")
         print(f"Model: {response}")
