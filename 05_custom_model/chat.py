@@ -10,17 +10,18 @@ def chat_with_model(model_dir: str):
     print("Starting chat session. Type 'exit' to quit.")
     # Maintain chat history for multi-turn conversations
     messages = []
-    first_message = True
     while True:
         user_input = input("You: ")
         if user_input.lower() == "exit":
             print("Exiting chat session.")
             break
 
-        if first_message:
-            messages
+        print(f"User input: {user_input}")
+
         # Add user message to chat history
         messages.append({"role": "user", "content": user_input})
+        print(f"Chat history: {messages}")
+        # Encode the messages using the tokenizer
 
         # Use the chat template for encoding
         inputs = tokenizer.apply_chat_template(
@@ -30,6 +31,10 @@ def chat_with_model(model_dir: str):
             truncation=True,
             padding="max_length"
         )
+        print(f"Inputs: {inputs}")
+        print(f"Inputs (token IDs): {inputs['input_ids']}")
+        print(f"Inputs (attention mask): {inputs['attention_mask']}")
+        print(f"Inputs (token type IDs): {inputs['token_type_ids']}")
 
         outputs = model.generate(
             inputs,
