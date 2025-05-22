@@ -6,10 +6,13 @@ from trl import SFTTrainer
 
 # Step 1: Load and format your dataset
 def format_prompts(examples):
-    # Adjust this function to match your dataset structure
-    # Here we assume 'prompt' and 'completion' keys as in your previous data
+    # Support both 'prompt'/'completion' and 'instruction'/'response' keys
     texts = []
-    for prompt, completion in zip(examples['prompt'], examples['completion']):
+    prompts = examples.get('prompt') or examples.get('instruction')
+    completions = examples.get('completion') or examples.get('response')
+    if prompts is None or completions is None:
+        raise ValueError("Input data must contain either 'prompt'/'completion' or 'instruction'/'response' keys.")
+    for prompt, completion in zip(prompts, completions):
         texts.append(f"[INST] {prompt.strip()} [/INST] {completion.strip()}")
     return {'text': texts}
 
