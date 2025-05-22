@@ -8,7 +8,7 @@ model = AutoModelForCausalLM.from_pretrained(model_directory)
 device = "cpu" # the device to load the model onto
 
 messages = [
-    {"role": "user", "content": "What is your favourite condiment?"}
+    {"role": "user", "content": "What services does vji Corp offer?"}
 ]
 
 encodeds = tokenizer.apply_chat_template(messages, return_tensors="pt")
