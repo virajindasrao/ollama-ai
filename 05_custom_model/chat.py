@@ -32,9 +32,6 @@ def chat_with_model(model_dir: str):
             padding="max_length"
         )
         print(f"Inputs: {inputs}")
-        print(f"Inputs (token IDs): {inputs['input_ids']}")
-        print(f"Inputs (attention mask): {inputs['attention_mask']}")
-        print(f"Inputs (token type IDs): {inputs['token_type_ids']}")
 
         outputs = model.generate(
             inputs,
