@@ -1,3 +1,4 @@
+import os
 import torch
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, TrainingArguments
@@ -21,7 +22,8 @@ dataset = dataset["train"].map(format_prompts, batched=True)
 
 # Step 2: Set up the model and tokenizer
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
+hf_token = os.environ.get("HUGGINGFACE_TOKEN", None)
+tokenizer = AutoTokenizer.from_pretrained(model_id, token=hf_token)
 
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -29,7 +31,7 @@ bnb_config = BitsAndBytesConfig(
     bnb_4bit_quant_type="nf4",
     bnb_4bit_compute_dtype=torch.bfloat16
 )
-model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=bnb_config)
+model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=bnb_config, token=hf_token)
 model = prepare_model_for_kbit_training(model)
 model.gradient_checkpointing_enable()
 
